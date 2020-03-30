@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-#import json
 import requests
 import threading
 from binance.client import Client
@@ -11,12 +10,11 @@ from binance.websockets import BinanceSocketManager
 from config import *
 
 
-__version__ = '0.2a1'
+__version__ = '0.2b1'
 __license__ = 'GPLv3'
 
 
 vstore = None
-symbols = None
 
 
 def percentage(part, whole):
@@ -34,7 +32,7 @@ def get_watch_symbols():
 
 def init_vstore():
     # Init the vstore
-    symbols = make_sdict()
+    make_sdict()
     for s in symbols.keys():
         vstore.now[s] = 0
         vstore.cmin[s] = 0
@@ -49,21 +47,20 @@ def make_sdict():
         mname = sname + 'USDT'
         ename = mname.lower() + '@aggTrade'
         symbols[mname] = [sname, ename]
-    return symbols
 
 
 def get_avrg(client, sevent):
     # Average price picker thread
     while True:
         for s in symbols.keys():
-            price = client.get_avg_price(symbol=s)['price']
+            price = float(client.get_avg_price(symbol=s)['price'])
             vstore.avrg[s] = round(price, 4)
             time.sleep(0.5)
         get_24h(client)
 
         # Notify the main thread we are ready
         if not sevent.is_set():
-            svent.set()
+            sevent.set()
         time.sleep(300)
 
 
@@ -83,8 +80,8 @@ def get_24h(client):
 
 
 def spam(currency, msg):
-    if (vstore.last[currnecy] + slack_msg_limit) < time.time():
-        slack_msg(':%s: %s %s' % (currency[:3].lower(), currnecy[:3], m))
+    if (vstore.last[currency] + slack_msg_limit) < time.time():
+        slack_msg(':%s: %s %s' % (currency[:3].lower(), currency[:3], msg))
         vstore.last[currency] = time.time()
 
     # debug
@@ -102,6 +99,8 @@ def round_to(price):
         r = 1
     elif (price >= 1000):
         r = 0
+    else:
+        r = 4
     return r
 
 
@@ -130,7 +129,7 @@ def process_message(msg, r=4):
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
         vstore.cmax[currency] = round(price + (price * 0.005), r)
         vstore.cmin[currency] = round(price - (price * 0.005), r)
-        spam(currency, 'Alert limits --- Low: $%s High: $%s' % (
+        spam(currency, 'Alert limits [low: $%s / high: $%s]' % (
             round(vstore.cmin[currency], r),
             round(vstore.cmax[currency], r))
         )
@@ -179,7 +178,7 @@ def process_message(msg, r=4):
 
     # Price change
     if vstore.now[currency] != price:
-        p_change = round_it(percentage(vstore.avrg[currency], price), 5)
+        p_change = round(percentage(vstore.avrg[currency], price), r)
         vstore.now[currency] = price
 
         # Is price change bigger then 1%? 3%?
@@ -223,8 +222,7 @@ if __name__ == '__main__':
     threading.Thread(target=get_avrg, args=(client, sevent,)).start()
 
     # Sleep untill avg values are fetched
-    while not sevent.is_set():
-        time.sleep(0.1)
+    sevent.wait()
 
     # Send message to notify that we'll start watching the market
     slack_msg(':gledamte:')
