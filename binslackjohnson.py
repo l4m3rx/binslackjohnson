@@ -175,7 +175,7 @@ def process_message(msg):
         m = 'price - *$%s*.\n --- This is $-%s below daily minimum [*$%s*]' % \
             (price,
              round_it(vstore.min24[currency] - price),
-             round_it(vstore.min24[currency],)
+             round_it(vstore.min24[currency]))
         spam(currency, m)
 
     # Above 24h max?
