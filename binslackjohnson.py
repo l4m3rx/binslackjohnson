@@ -148,7 +148,7 @@ def process_message(msg, r=4):
         )
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
-        spam_msg = 'new top: $%s !!!\n' % (round(price, r))
+        spam_msg = 'new top: *$%s* !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h top: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.max24[currency], r),
                                         vstore.percent24[currency])
@@ -161,7 +161,7 @@ def process_message(msg, r=4):
             vstore.cmax[currency] = vstore.max24[currency]
 
     if (vstore.cmin[currency] > price) and (vstore.min24[currency] < price):
-        spam_msg = 'new low: $%s !!!\n' % (round(price, r))
+        spam_msg = 'new low: *$%s* !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.min24[currency], r),
                                         vstore.percent24[currency])
@@ -191,23 +191,23 @@ def process_message(msg, r=4):
 
     # Is price change bigger then 1%? 3%?
     if (abs(p_change) > 1) and (abs(p_change) < 3):
-        m = 'price - $%s change %s%% from 5m avg\n' % \
+        m = 'price - *$%s* change %s%% from 5m avg\n' % \
             (round(price, r), round(p_change, 1))
 
         if price < vstore.min24[currency]:
-            m += '@here This is $%s below the daily minium [$%s]' % \
+            m += '@here This is *$%s* below the daily minium [$%s]' % \
                 (round(price - vstore.min24[currency], r),
                  round(vstore.min24[currency], r))
         else:
-            m += 'That is $%s above the daily minimum [$%s]' % \
+            m += 'That is *$%s* above the daily minimum [$%s]' % \
                 (round(price - vstore.min24[currency], r),
                  round(vstore.min24[currency], r))
         spam(currency, m)
     elif abs(p_change) > 3:
-        m = '@here price $%s change %s%% from 5m avg!' % \
+        m = '@here price *$%s* change %s%% from 5m avg!' % \
             (round(price, r), round(p_change, 1))
         if price > vstore.cmax24[currency]:
-            m += 'This is $%s above the daily maximum [$%s]' % \
+            m += 'This is *$%s* above the daily maximum [$%s]' % \
                 (round(vstore.max24[currency] - price, r),
                  round(vstore.max24[currency], r))
         spam(currency, m)
@@ -227,9 +227,9 @@ class sbot(threading.Thread):
     @listen_to('.help', re.IGNORECASE)
     def help(message):
         message.react('+1')
-        msg = 'Available commands:\n .help --- Display help\n'
-        msg += ' .status --- Display all monitored currency status\n'
-        msg += ' .price <coin> --- To display current stats for a specific coin\n'
+        msg = 'Available commands:\n *.help* --- Display help\n'
+        msg += ' *.status* --- Display all monitored currency status\n'
+        msg += ' *.price <coin>* --- To display current stats for a specific coin\n'
         message.send(msg)
 
 
