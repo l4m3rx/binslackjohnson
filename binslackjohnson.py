@@ -232,8 +232,8 @@ class sbot(threading.Thread):
         message.react('+1')
         for c in symbols.keys():
             message.send(':%s: price $%s. Daily: $%s-$%s [%s%%]' % \
-                (symbols[c].lower(), vstore.now[c], vstore.min24[c],
-                vstore.max24[c], vstore.percent24[c])
+                (symbols[c][0].lower(), vstore.now[c], vstore.min24[c],
+                vstore.max24[c], vstore.percent24[c]))
 
 
     @listen_to('price (.*)', re.IGNORECASE)
