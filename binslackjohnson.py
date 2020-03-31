@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2c2'
+__version__ = '0.2c3'
 __license__ = 'GPLv3'
 
 
@@ -227,9 +227,9 @@ class sbot(threading.Thread):
     @listen_to('.help', re.IGNORECASE)
     def help(message):
         message.react('+1')
-        msg = 'Available commands:\n .help --- Display help\n'
-        msg += ' .status --- Display all monitored currency status\n'
-        msg += ' .price <coin> --- To display current stats for a specific coin\n'
+        msg = 'Available commands:\n *.help* --- Display help\n'
+        msg += ' *.status* --- Display all monitored currency status\n'
+        msg += ' *.price <coin>* --- To display current stats for a specific coin\n'
         message.send(msg)
 
 
@@ -252,7 +252,7 @@ class sbot(threading.Thread):
         if currency in symbols.keys():
             message.react('+1')
             message.send(
-                ':%s: current price $%s\n --- Daily stats $%s-$%s [%s%%]' % \
+                ':%s: current price *$%s*\n --- Daily stats $%s-$%s [%s%%]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
