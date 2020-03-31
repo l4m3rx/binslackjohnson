@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2b7'
+__version__ = '0.2b8'
 __license__ = 'GPLv3'
 
 
@@ -140,8 +140,8 @@ def process_message(msg, r=4):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round(price + (price * 0.001), r)
-        vstore.cmin[currency] = round(price - (price * 0.001), r)
+        vstore.cmax[currency] = round(price + (price * 0.0004), r)
+        vstore.cmin[currency] = round(price - (price * 0.0004), r)
         spam(currency, 'Alert limits [low: $%s / high: $%s]' % (
             round(vstore.cmin[currency], r),
             round(vstore.cmax[currency], r))
@@ -224,7 +224,16 @@ class sbot(threading.Thread):
         self.bot.run()
 
 
-    @listen_to('status', re.IGNORECASE)
+    @listen_to('.help', re.IGNORECASE)
+    def help(message):
+        message.react('+1')
+        msg = 'Available commands:\n .help --- Display help\n'
+        msg += ' .status --- Display all monitored currency status\n'
+        msg += ' .price <coin> --- To display current stats for a specific coin\n'
+        message.send(msg)
+
+
+    @listen_to('.status', re.IGNORECASE)
     def status(message):
         message.react('+1')
         for c in symbols.keys():
@@ -237,7 +246,7 @@ class sbot(threading.Thread):
             message.send(msg)
 
 
-    @listen_to('price (.*)', re.IGNORECASE)
+    @listen_to('.price (.*)', re.IGNORECASE)
     def price(message, cur):
         currency = cur.upper() + 'USDT'
         if currency in symbols.keys():
