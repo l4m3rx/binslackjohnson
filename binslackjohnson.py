@@ -237,9 +237,9 @@ class sbot(threading.Thread):
     def status(message):
         message.react('+1')
         for c in symbols.keys():
-            msg = ':%s: %s current price: $%s\n' % \
+            msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- Daily: $%s-$%s [%s%%]\n' % \
+            msg += ' --- Daily: $%s-$%s [*%s%%*]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
             msg += ' --- Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
@@ -252,7 +252,7 @@ class sbot(threading.Thread):
         if currency in symbols.keys():
             message.react('+1')
             message.send(
-                ':%s: current price $%s\n --- Daily stats $%s-$%s [%s%%]' % \
+                ':%s: current price *$%s*\n --- Daily stats $%s-$%s [*%s%%*]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
