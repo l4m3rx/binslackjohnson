@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2b5'
+__version__ = '0.2b6'
 __license__ = 'GPLv3'
 
 
@@ -88,6 +88,8 @@ def get_24h(client):
 
 
 def spam(currency, msg):
+    if use_stdout:
+        print('[%s] spam() %s: %s' % (time.ctime(), currency, msg))
     if (vstore.last[currency] + slack_msg_limit) < time.time():
         slack_msg(':%s: %s %s' % (currency[:3].lower(), currency[:3], msg))
         vstore.last[currency] = time.time()
@@ -114,8 +116,6 @@ def round_to(price):
 
 def slack_msg(text):
     # Send the slack message (POST)
-    if use_stdout:
-        print('[%s] slack_msg() %s' % (time.ctime(), text))
     post = {
         'username': 'Pesho',
         'icon_emoji': ':robot_face:',
@@ -130,7 +130,9 @@ def process_message(msg, r=4):
     # Process incomming websocket message (binance API)
     currency = msg['data']['s']
     price = float(msg['data']['p'])
+    # Current price and change
     p_change = round(percentage(vstore.avrg[currency], price), r)
+    vstore.now[currency] = price
 
     # Set correct price rounding
     r = round_to(price)
@@ -138,8 +140,8 @@ def process_message(msg, r=4):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round(price + (price * 0.002), r)
-        vstore.cmin[currency] = round(price - (price * 0.002), r)
+        vstore.cmax[currency] = round(price + (price * 0.001), r)
+        vstore.cmin[currency] = round(price - (price * 0.001), r)
         spam(currency, 'Alert limits [low: $%s / high: $%s]' % (
             round(vstore.cmin[currency], r),
             round(vstore.cmax[currency], r))
@@ -187,11 +189,6 @@ def process_message(msg, r=4):
               round(vstore.max24[currency], r))
         spam(currency, m)
 
-    # Price change
-    #if vstore.now[currency] != price:
-    p_change = round(percentage(vstore.avrg[currency], price), r)
-    vstore.now[currency] = price
-
     # Is price change bigger then 1%? 3%?
     if (abs(p_change) > 1) and (abs(p_change) < 3):
         m = 'price - $%s change %s%% from 5m avg\n' % \
@@ -231,9 +228,13 @@ class sbot(threading.Thread):
     def status(message):
         message.react('+1')
         for c in symbols.keys():
-            message.send(':%s: price $%s. Daily: $%s-$%s [%s%%]' % \
-                (symbols[c][0].lower(), vstore.now[c], vstore.min24[c],
-                vstore.max24[c], vstore.percent24[c]))
+            msg = ':%s: %s current price - $%s\n' % \
+                (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
+            msg += ' --- Daily: $%s-$%s [%s%%]\n'
+                (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
+            msg += '--- Notificaiton threshold: $%s-$%s\n ------------' % \
+                (vstore.cmin[c], vstore.cmax[c])
+            message.send(msg)
 
 
     @listen_to('price (.*)', re.IGNORECASE)
