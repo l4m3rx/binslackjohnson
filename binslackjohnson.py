@@ -140,14 +140,14 @@ def process_message(msg, r=4):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round(price + (price * 0.0004), r)
-        vstore.cmin[currency] = round(price - (price * 0.0004), r)
+        vstore.cmax[currency] = round(price + (price * 0.001), r)
+        vstore.cmin[currency] = round(price - (price * 0.001), r)
         spam(currency, 'Alert limits [low: $%s / high: $%s]' % (
             round(vstore.cmin[currency], r),
             round(vstore.cmax[currency], r))
         )
     # Check if we have new min/max
-    if (vstore.cmax[currency] > price) and (vstore.max24[currency] > price):
+    if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
         spam_msg = 'new top: $%s !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h top: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.max24[currency], r),
@@ -160,7 +160,7 @@ def process_message(msg, r=4):
         else:
             vstore.cmax[currency] = vstore.max24[currency]
 
-    if (vstore.cmin[currency] < price) and (vstore.min24[currency] < price):
+    if (vstore.cmin[currency] > price) and (vstore.min24[currency] < price):
         spam_msg = 'new low: $%s !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.min24[currency], r),
