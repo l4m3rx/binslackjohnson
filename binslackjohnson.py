@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2c3'
+__version__ = '0.2c4'
 __license__ = 'GPLv3'
 
 
