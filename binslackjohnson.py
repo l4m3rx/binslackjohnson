@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2c1'
+__version__ = '0.2c2'
 __license__ = 'GPLv3'
 
 
@@ -148,7 +148,7 @@ def process_message(msg, r=4):
         )
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
-        spam_msg = 'new top: *$%s* !!!\n' % (round(price, r))
+        spam_msg = 'new top: $%s !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h top: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.max24[currency], r),
                                         vstore.percent24[currency])
@@ -161,7 +161,7 @@ def process_message(msg, r=4):
             vstore.cmax[currency] = vstore.max24[currency]
 
     if (vstore.cmin[currency] > price) and (vstore.min24[currency] < price):
-        spam_msg = 'new low: *$%s* !!!\n' % (round(price, r))
+        spam_msg = 'new low: $%s !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.min24[currency], r),
                                         vstore.percent24[currency])
@@ -191,23 +191,23 @@ def process_message(msg, r=4):
 
     # Is price change bigger then 1%? 3%?
     if (abs(p_change) > 1) and (abs(p_change) < 3):
-        m = 'price - *$%s* change %s%% from 5m avg\n' % \
+        m = 'price - $%s change %s%% from 5m avg\n' % \
             (round(price, r), round(p_change, 1))
 
         if price < vstore.min24[currency]:
-            m += '@here This is *$%s* below the daily minium [$%s]' % \
+            m += '@here This is $%s below the daily minium [$%s]' % \
                 (round(price - vstore.min24[currency], r),
                  round(vstore.min24[currency], r))
         else:
-            m += 'That is *$%s* above the daily minimum [$%s]' % \
+            m += 'That is $%s above the daily minimum [$%s]' % \
                 (round(price - vstore.min24[currency], r),
                  round(vstore.min24[currency], r))
         spam(currency, m)
     elif abs(p_change) > 3:
-        m = '@here price *$%s* change %s%% from 5m avg!' % \
+        m = '@here price $%s change %s%% from 5m avg!' % \
             (round(price, r), round(p_change, 1))
         if price > vstore.cmax24[currency]:
-            m += 'This is *$%s* above the daily maximum [$%s]' % \
+            m += 'This is $%s above the daily maximum [$%s]' % \
                 (round(vstore.max24[currency] - price, r),
                  round(vstore.max24[currency], r))
         spam(currency, m)
@@ -227,9 +227,9 @@ class sbot(threading.Thread):
     @listen_to('.help', re.IGNORECASE)
     def help(message):
         message.react('+1')
-        msg = 'Available commands:\n *.help* --- Display help\n'
-        msg += ' *.status* --- Display all monitored currency status\n'
-        msg += ' *.price <coin>* --- To display current stats for a specific coin\n'
+        msg = 'Available commands:\n .help --- Display help\n'
+        msg += ' .status --- Display all monitored currency status\n'
+        msg += ' .price <coin> --- To display current stats for a specific coin\n'
         message.send(msg)
 
 
@@ -237,9 +237,9 @@ class sbot(threading.Thread):
     def status(message):
         message.react('+1')
         for c in symbols.keys():
-            msg = ':%s: %s current price: *$%s*\n' % \
+            msg = ':%s: %s current price: $%s\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- Daily: $%s-$%s [*%s%%*]\n' % \
+            msg += ' --- Daily: $%s-$%s [%s%%]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
             msg += ' --- Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
@@ -252,7 +252,7 @@ class sbot(threading.Thread):
         if currency in symbols.keys():
             message.react('+1')
             message.send(
-                ':%s: current price *$%s*\n --- Daily stats $%s-$%s [*%s%%*]' % \
+                ':%s: current price $%s\n --- Daily stats $%s-$%s [%s%%]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     init_vstore()
 
     # Spam that we are starting
-    slack_msg('BinSlackJohnson v%s in da house!' % __version__)
+    slack_msg('BinSlackJohnson `v%s` in da house!' % __version__)
 
     # Binance connection
     client = Client(access_key, secret_key)
