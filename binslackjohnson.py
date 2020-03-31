@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2b4'
+__version__ = '0.2b5'
 __license__ = 'GPLv3'
 
 
@@ -224,8 +224,17 @@ class sbot(threading.Thread):
         self.bot = Bot()
 
     def run(self):
-        print("Starting")
         self.bot.run()
+
+
+    @listen_to('status', re.IGNORECASE)
+    def status(message):
+        message.react('+1')
+        for c in symbols.keys():
+            message.send(':%s: price $%s. Daily: $%s-$%s [%s%%]' % \
+                (symbols[c].lower(), vstore.now[c], vstore.min24[c],
+                vstore.max24[c], vstore.percent24[c])
+
 
     @listen_to('price (.*)', re.IGNORECASE)
     def price(message, cur):
