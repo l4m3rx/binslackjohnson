@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2b9'
+__version__ = '0.2b10'
 __license__ = 'GPLv3'
 
 
@@ -162,7 +162,7 @@ def process_message(msg, r=4):
 
     if (vstore.cmin[currency] < price) and (vstore.min24[currency] < price):
         spam_msg = 'new low: $%s !!!\n' % (round(price, r))
-        spam_msg = ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
+        spam_msg += ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.min24[currency], r),
                                         vstore.percent24[currency])
         spam(currency, spam_msg)
