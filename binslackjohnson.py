@@ -11,13 +11,13 @@ from binance.websockets import BinanceSocketManager
 
 import slackbot.settings
 from slackbot.bot import Bot
-from slackbot.bot import respond_to
 from slackbot.bot import listen_to
+from slackbot.bot import respond_to
 
 from config import *
 
 
-__version__ = '0.2d1'
+__version__ = '0.2d2'
 __license__ = 'GPLv3'
 
 
@@ -58,28 +58,32 @@ def make_sdict():
 
 def get_avrg(client, sevent):
     # Average price picker thread
+    ran = False
+
     while True:
         for s in symbols.keys():
-            price = float(client.get_avg_price(symbol=s)['price'])
-            vstore.avrg[s] = round(price, 4)
-            time.sleep(0.1)
-        get_24h(client)
+            price = client.get_avg_price(symbol=s)['price']
+            vstore.avrg[s] = round_it(float(price))
+            if not ran:
+                time.sleep(1)
 
-        # Notify the main thread we are ready
-        if not sevent.is_set():
-            sevent.set()
-        # Sleep before we go again
+        get_24h(client, ran)
+
+        ran = True
+        sevent.set()
+
         time.sleep(300)
 
 
-def get_24h(client):
+def get_24h(client, ran=False):
     # Get last 24h top/low/%change for all currencies
     for s in symbols.keys():
         tk = client.get_ticker(symbol=s)
         vstore.max24[s] = float(tk['highPrice'])
         vstore.min24[s] = float(tk['lowPrice'])
         vstore.percent24[s] = tk['priceChangePercent']
-        time.sleep(0.1)
+        if not ran:
+            time.sleep(1)
 
         # debug
         if use_stdout:
@@ -88,6 +92,7 @@ def get_24h(client):
 
 
 def spam(currency, msg):
+    # Slack message mutex function
     if use_stdout:
         print('[%s] spam() %s: %s' % (time.ctime(), currency, msg))
     if (vstore.last[currency] + slack_msg_limit) < time.time():
@@ -273,10 +278,9 @@ if __name__ == '__main__':
 
     # Start slackbot
     bot = sbot().start()
+    
     # Sleep untill avg values are fetched
     sevent.wait()
-
-    # Send message to notify that we'll start watching the market
     slack_msg(':gledamte:')
 
     # 0ff we go
