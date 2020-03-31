@@ -17,7 +17,7 @@ from slackbot.bot import listen_to
 from config import *
 
 
-__version__ = '0.2b2'
+__version__ = '0.2b4'
 __license__ = 'GPLv3'
 
 
@@ -114,6 +114,8 @@ def round_to(price):
 
 def slack_msg(text):
     # Send the slack message (POST)
+    if use_stdout:
+        print('[%s] slack_msg() %s' % (time.ctime(), text))
     post = {
         'username': 'Pesho',
         'icon_emoji': ':robot_face:',
@@ -128,6 +130,7 @@ def process_message(msg, r=4):
     # Process incomming websocket message (binance API)
     currency = msg['data']['s']
     price = float(msg['data']['p'])
+    p_change = round(percentage(vstore.avrg[currency], price), r)
 
     # Set correct price rounding
     r = round_to(price)
@@ -135,8 +138,8 @@ def process_message(msg, r=4):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round(price + (price * 0.005), r)
-        vstore.cmin[currency] = round(price - (price * 0.005), r)
+        vstore.cmax[currency] = round(price + (price * 0.002), r)
+        vstore.cmin[currency] = round(price - (price * 0.002), r)
         spam(currency, 'Alert limits [low: $%s / high: $%s]' % (
             round(vstore.cmin[currency], r),
             round(vstore.cmax[currency], r))
@@ -185,32 +188,32 @@ def process_message(msg, r=4):
         spam(currency, m)
 
     # Price change
-    if vstore.now[currency] != price:
-        p_change = round(percentage(vstore.avrg[currency], price), r)
-        vstore.now[currency] = price
+    #if vstore.now[currency] != price:
+    p_change = round(percentage(vstore.avrg[currency], price), r)
+    vstore.now[currency] = price
 
-        # Is price change bigger then 1%? 3%?
-        if (abs(p_change) > 1) and (abs(p_change) < 3):
-            m = 'price - $%s change %s%% from 5m avg\n' % \
-                (round(price, r), round(p_change, 1))
+    # Is price change bigger then 1%? 3%?
+    if (abs(p_change) > 1) and (abs(p_change) < 3):
+        m = 'price - $%s change %s%% from 5m avg\n' % \
+            (round(price, r), round(p_change, 1))
 
-            if price < vstore.min24[currency]:
-                m += '@here This is $%s below the daily minium [$%s]' % \
-                    (round(price - vstore.min24[currency], r),
-                     round(vstore.min24[currency], r))
-            else:
-                m += 'That is $%s above the daily minimum [$%s]' % \
-                    (round(price - vstore.min24[currency], r),
-                     round(vstore.min24[currency], r))
-            spam(currency, m)
-        elif abs(p_change) > 3:
-            m = '@here price $%s change %s%% from 5m avg!' % \
-                (round(price, r), round(p_change, 1))
-            if price > vstore.cmax24[currency]:
-                m += 'This is $%s above the daily maximum [$%s]' % \
-                    (round(vstore.max24[currency] - price, r),
-                     round(vstore.max24[currency], r))
-            spam(currency, m)
+        if price < vstore.min24[currency]:
+            m += '@here This is $%s below the daily minium [$%s]' % \
+                (round(price - vstore.min24[currency], r),
+                 round(vstore.min24[currency], r))
+        else:
+            m += 'That is $%s above the daily minimum [$%s]' % \
+                (round(price - vstore.min24[currency], r),
+                 round(vstore.min24[currency], r))
+        spam(currency, m)
+    elif abs(p_change) > 3:
+        m = '@here price $%s change %s%% from 5m avg!' % \
+            (round(price, r), round(p_change, 1))
+        if price > vstore.cmax24[currency]:
+            m += 'This is $%s above the daily maximum [$%s]' % \
+                (round(vstore.max24[currency] - price, r),
+                 round(vstore.max24[currency], r))
+        spam(currency, m)
 
 
 
