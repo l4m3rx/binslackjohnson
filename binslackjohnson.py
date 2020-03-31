@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import re
 import time
 import requests
 import threading
+
 from binance.client import Client
 from binance.websockets import BinanceSocketManager
+
+import slackbot.settings
+from slackbot.bot import Bot
+from slackbot.bot import respond_to
+from slackbot.bot import listen_to
 
 from config import *
 
 
-__version__ = '0.2b1'
+__version__ = '0.2b2'
 __license__ = 'GPLv3'
 
 
@@ -55,12 +62,13 @@ def get_avrg(client, sevent):
         for s in symbols.keys():
             price = float(client.get_avg_price(symbol=s)['price'])
             vstore.avrg[s] = round(price, 4)
-            time.sleep(0.5)
+            time.sleep(0.1)
         get_24h(client)
 
         # Notify the main thread we are ready
         if not sevent.is_set():
             sevent.set()
+        # Sleep before we go again
         time.sleep(300)
 
 
@@ -71,7 +79,7 @@ def get_24h(client):
         vstore.max24[s] = float(tk['highPrice'])
         vstore.min24[s] = float(tk['lowPrice'])
         vstore.percent24[s] = tk['priceChangePercent']
-        time.sleep(0.5)
+        time.sleep(0.1)
 
         # debug
         if use_stdout:
@@ -138,7 +146,7 @@ def process_message(msg, r=4):
         spam_msg = 'new top: $%s !!!\n' % (round(price, r))
         spam_msg += ' --- Last 24h top: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.max24[currency], r),
-                                        round(vstore.percent24[currency], r))
+                                        vstore.percent24[currency])
         spam(currency, spam_msg)
 
         # Don't keep tops above 24h top
@@ -151,7 +159,7 @@ def process_message(msg, r=4):
         spam_msg = 'new low: $%s !!!\n' % (round(price, r))
         spam_msg = ' --- Last 24h bottom: $%s | Last 24h change: %s%%]' % \
                                         (round(vstore.min24[currency], r),
-                                        round(vstore.percent24[currency], r))
+                                        vstore.percent24[currency])
         spam(currency, spam_msg)
 
         # Don't keep lows below 24h low
@@ -205,6 +213,29 @@ def process_message(msg, r=4):
             spam(currency, m)
 
 
+
+class sbot(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        slackbot.settings.API_TOKEN = slack_token
+        self.bot = Bot()
+
+    def run(self):
+        print("Starting")
+        self.bot.run()
+
+    @listen_to('price (.*)', re.IGNORECASE)
+    def price(message, cur):
+        currency = cur.upper() + 'USDT'
+        if currency in symbols.keys():
+            message.react('+1')
+            message.send(
+                ':%s: current price $%s\n --- Daily stats $%s-$%s [%s%%]' % \
+                (cur.lower() ,vstore.now[currency], vstore.min24[currency],
+                vstore.max24[currency], vstore.percent24[currency]))
+
+
+
 if __name__ == '__main__':
     # Init application
     sevent = threading.Event()
@@ -221,6 +252,8 @@ if __name__ == '__main__':
     # Average values thread
     threading.Thread(target=get_avrg, args=(client, sevent,)).start()
 
+    # Start slackbot
+    bot = sbot().start()
     # Sleep untill avg values are fetched
     sevent.wait()
 
