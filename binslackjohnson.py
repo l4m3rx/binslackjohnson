@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d3'
+__version__ = '0.2d4'
 __license__ = 'GPLv3'
 
 
@@ -95,13 +95,10 @@ def spam(currency, msg):
     # Slack message mutex function
     if use_stdout:
         print('[%s] spam() %s: %s' % (time.ctime(), currency, msg))
+
     if (vstore.last[currency] + slack_msg_limit) < time.time():
         slack_msg(':%s: %s %s' % (currency[:3].lower(), currency[:3], msg))
         vstore.last[currency] = time.time()
-
-    # debug
-    if use_stdout:
-        print('[%s] %s: %s' % (time.ctime(), currency[:3], msg))
 
 
 def round_it(price):
@@ -150,7 +147,7 @@ def process_message(msg):
         )
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
-        spam_msg = 'new top: *$%s* :arrow_up: !!!\n' % (round_it(price))
+        spam_msg = 'new top: *$%s* :top: !!!\n' % (round_it(price))
         spam_msg += ' --- Last 24h top: *$%s* | Last 24h change: `%s%%`]' % \
                                         (round_it(vstore.max24[currency]),
                                         vstore.percent24[currency])
@@ -177,7 +174,7 @@ def process_message(msg):
 
     # below 24h min?
     if price < vstore.min24[currency]:
-        m = 'price - *$%s*.\n --- This is :arrow_down: $-%s below daily minimum [*$%s*]' % \
+        m = 'price - *$%s* :arrow_down: \n --- This is $-%s below daily minimum [*$%s*]' % \
             (price,
              round_it(vstore.min24[currency] - price),
              round_it(vstore.min24[currency]))
@@ -185,7 +182,7 @@ def process_message(msg):
 
     # Above 24h max?
     if price > vstore.max24[currency]:
-        m = 'price - *$%s*\n --- This is :arrow_up: $%s above the daily maximum [*$%s*]' % \
+        m = 'price - *$%s* :top: \n --- This is :arrow_up: $%s above the daily maximum [*$%s*]' % \
              (price,
               round_it(price - vstore.max24[currency]),
               round_it(vstore.max24[currency]))
@@ -241,9 +238,9 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- Daily: $%s-$%s [`%s%%`]\n' % \
+            msg += ' --- :arrow_forward: Daily: $%s-$%s [`%s%%`]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
-            msg += ' --- Notificaiton threshold: $%s-$%s\n' % \
+            msg += ' --- :arrow_forward: Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
             message.send(msg)
 
@@ -254,7 +251,7 @@ class sbot(threading.Thread):
         if currency in symbols.keys():
             message.react('+1')
             message.send(
-                ':%s: current price *$%s*\n --- Daily stats $%s-$%s [`%s%%`]' % \
+                ':%s: current price *$%s*\n --- :arrow_forward: Daily stats $%s-$%s [`%s%%`]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
