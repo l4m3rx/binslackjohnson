@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d6'
+__version__ = '0.2d7'
 __license__ = 'GPLv3'
 
 
@@ -104,9 +104,9 @@ def spam(currency, msg):
 def round_it(price):
     # Round the prices to more human numbers
     if (price > 1) and (price < 10):
-        price = round(price, 2)
-    elif (price >= 10) and (price < 100):
         price = round(price, 3)
+    elif (price >= 10) and (price < 100):
+        price = round(price, 2)
     elif (price >= 100) and (price < 1000):
         price = round(price, 1)
     elif (price >= 1000):
@@ -139,8 +139,8 @@ def process_message(msg):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round_it(price + (price * 0.005))
-        vstore.cmin[currency] = round_it(price - (price * 0.005))
+        vstore.cmax[currency] = round_it(price + (price * 0.007))
+        vstore.cmin[currency] = round_it(price - (price * 0.007))
         spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
             round_it(vstore.cmin[currency]),
             round_it(vstore.cmax[currency]))
