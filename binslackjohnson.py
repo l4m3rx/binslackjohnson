@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d5'
+__version__ = '0.2d6'
 __license__ = 'GPLv3'
 
 
@@ -194,11 +194,11 @@ def process_message(msg):
             (price, round(p_change, 1))
 
         if price < vstore.min24[currency]:
-            m += '@here This is :arrow_up: *$%s* below the daily minium [*$%s*]' % \
+            m += '@here This is :arrow_down: *$%s* below the daily minium [*$%s*]' % \
                 (round_it(price - vstore.min24[currency]),
                  round_it(vstore.min24[currency]))
         else:
-            m += 'That is :arrow_down: *$%s* above the daily minimum [*$%s*]' % \
+            m += 'That is :top: *$%s* above the daily minimum [*$%s*]' % \
                 (round_it(price - vstore.min24[currency]),
                  round_it(vstore.min24[currency]))
         spam(currency, m)
@@ -206,7 +206,7 @@ def process_message(msg):
         m = '@here price *$%s* change `%s%%` from 5m avg!' % \
             (price, round(p_change, 1))
         if price > vstore.cmax24[currency]:
-            m += 'This is :arrow_down: *$%s* above the daily maximum [*$%s*]' % \
+            m += 'This is :top: *$%s* above the daily maximum [*$%s*]' % \
                 (round_it(vstore.max24[currency] - price),
                  round_it(vstore.max24[currency]))
         spam(currency, m)
