@@ -238,9 +238,9 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' * Daily: $%s-$%s [`%s%%`]\n' % \
+            msg += ' --- Daily: $%s-$%s [`%s%%`]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
-            msg += ' * Notificaiton threshold: $%s-$%s\n' % \
+            msg += ' --- Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
             message.send(msg)
 
