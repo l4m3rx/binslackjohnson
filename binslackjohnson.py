@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d4'
+__version__ = '0.2d5'
 __license__ = 'GPLv3'
 
 
@@ -238,9 +238,9 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- :arrow_forward: Daily: $%s-$%s [`%s%%`]\n' % \
+            msg += ' * Daily: $%s-$%s [`%s%%`]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
-            msg += ' --- :arrow_forward: Notificaiton threshold: $%s-$%s\n' % \
+            msg += ' * Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
             message.send(msg)
 
