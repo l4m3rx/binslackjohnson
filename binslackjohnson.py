@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3b2'
+__version__ = '0.3b3'
 __license__ = 'GPLv3'
 
 
@@ -146,10 +146,10 @@ def process_message(msg):
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
         vstore.cmax[currency] = round_it(price + get_1p(price))
         vstore.cmin[currency] = round_it(price - get_1p(price))
-        spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
-            round_it(vstore.cmin[currency]),
-            round_it(vstore.cmax[currency]))
-        )
+        #spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
+        #    round_it(vstore.cmin[currency]),
+        #    round_it(vstore.cmax[currency]))
+        #)
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
         spam_msg = 'new top: *$%s* :top: !!!\n' % (round_it(price))
@@ -250,7 +250,7 @@ class sbot(threading.Thread):
         message.react('+1')
         msg = 'Current prices stats: \n'
         for c in symbols.keys():
-            msg += ':%s: %s *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
+            msg += ':%s: %s -- *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
         message.send(msg)
 
 
