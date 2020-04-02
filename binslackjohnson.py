@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d10'
+__version__ = '0.2d11'
 __license__ = 'GPLv3'
 
 
@@ -184,6 +184,7 @@ def process_message(msg):
              round_it(vstore.min24[currency] - price),
              round_it(vstore.min24[currency]))
         spam(currency, m)
+        vstore.min24[currency] = price
 
     # Above 24h max?
     if price > vstore.max24[currency]:
@@ -192,6 +193,7 @@ def process_message(msg):
               round_it(price - vstore.max24[currency]),
               round_it(vstore.max24[currency]))
         spam(currency, m)
+        vstore.max24[currency] = price
 
     # Is price change bigger then 1%? 3%?
     if (abs(p_change) > 1) and (abs(p_change) < 3):
