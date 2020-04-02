@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3a1'
+__version__ = '0.3b1'
 __license__ = 'GPLv3'
 
 
@@ -240,7 +240,17 @@ class sbot(threading.Thread):
         message.react('+1')
         msg = 'Available commands:\n *.help* --- Display help\n'
         msg += ' *.status* --- Display all monitored currency status\n'
+        msg += ' *.stats* --- Display short stats (current price)'
         msg += ' *.price <coin>* --- To display current stats for a specific coin\n'
+        message.send(msg)
+
+
+    @listen_to('.stats$', re.IGNORECASE)
+    def stats(message):
+        message.react('+1')
+        m = 'Current prices stats: \n'
+        for c in symbols.keys():
+            m += ':%s: %s *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
         message.send(msg)
 
 
