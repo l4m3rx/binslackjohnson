@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d11'
+__version__ = '0.2d13'
 __license__ = 'GPLv3'
 
 
@@ -160,7 +160,7 @@ def process_message(msg):
 
         # Don't keep tops above 24h top
         if price < vstore.max24[currency]:
-            vstore.cmax[currency] = price + get_1p(price)
+            vstore.cmax[currency] = round_it(price + get_1p(price))
         else:
             vstore.cmax[currency] = vstore.max24[currency]
 
@@ -173,7 +173,7 @@ def process_message(msg):
 
         # Don't keep lows below 24h low
         if price > vstore.min24[currency]:
-            vstore.cmin[currency] = price - get_1p(price)
+            vstore.cmin[currency] = round_it(price - get_1p(price))
         else:
             vstore.cmin[currency] = vstore.min24[currency]
 
@@ -188,7 +188,7 @@ def process_message(msg):
 
     # Above 24h max?
     if price > vstore.max24[currency]:
-        m = 'price - *$%s* :top: \n --- This is :arrow_up: $%s above the daily maximum [*$%s*]' % \
+        m = 'price - *$%s* :top: \n --- This is $%s above the daily maximum [*$%s*]' % \
              (price,
               round_it(price - vstore.max24[currency]),
               round_it(vstore.max24[currency]))
