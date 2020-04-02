@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d7'
+__version__ = '0.2d8'
 __license__ = 'GPLv3'
 
 
@@ -139,8 +139,8 @@ def process_message(msg):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round_it(price + (price * 0.007))
-        vstore.cmin[currency] = round_it(price - (price * 0.007))
+        vstore.cmax[currency] = round_it(price + (price * 0.001))
+        vstore.cmin[currency] = round_it(price - (price * 0.001))
         spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
             round_it(vstore.cmin[currency]),
             round_it(vstore.cmax[currency]))
