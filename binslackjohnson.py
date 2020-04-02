@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d13'
+__version__ = '0.2d14'
 __license__ = 'GPLv3'
 
 
@@ -124,8 +124,8 @@ def round_it(price):
 def slack_msg(text):
     # Send the slack message (POST)
     post = {
-        'username': 'Pesho',
-        'icon_emoji': ':robot_face:',
+        'username': slack_bot_name,
+        'icon_emoji': slack_bot_icon,
         'channel': slack_channel,
         'token': slack_token,
         'text': text
@@ -208,10 +208,12 @@ def process_message(msg):
             m += 'That is *$%s* above the daily minimum [*$%s*]' % \
                 (round_it(price - vstore.min24[currency]),
                  round_it(vstore.min24[currency]))
+
         spam(currency, m)
     elif abs(p_change) > 3:
         m = '@here price *$%s* change `%s%%` from 5m avg!' % \
             (price, round(p_change, 1))
+
         if price > vstore.cmax24[currency]:
             m += 'This is *$%s* above the daily maximum [*$%s*]' % \
                 (round_it(vstore.max24[currency] - price),
