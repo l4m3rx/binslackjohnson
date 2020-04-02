@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3b1'
+__version__ = '0.3b2'
 __license__ = 'GPLv3'
 
 
@@ -248,9 +248,9 @@ class sbot(threading.Thread):
     @listen_to('.stats$', re.IGNORECASE)
     def stats(message):
         message.react('+1')
-        m = 'Current prices stats: \n'
+        msg = 'Current prices stats: \n'
         for c in symbols.keys():
-            m += ':%s: %s *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
+            msg += ':%s: %s *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
         message.send(msg)
 
 
