@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3b3'
+__version__ = '0.3b4'
 __license__ = 'GPLv3'
 
 
@@ -210,8 +210,8 @@ def process_message(msg):
                  round_it(vstore.min24[currency]))
 
         spam(currency, m)
-    elif abs(p_change) > 3:
-        m = '@here price *$%s* change `%s%%` from 5m avg!' % \
+    elif abs(p_change) >= 3:
+        m = '@here price - *$%s*. This is `%s%%` deviation from the 5 min average!!!' % \
             (price, round(p_change, 1))
 
         if price > vstore.cmax24[currency]:
@@ -237,7 +237,6 @@ class sbot(threading.Thread):
 
     @listen_to('.help$', re.IGNORECASE)
     def help(message):
-        message.react('+1')
         msg = 'Available commands:\n *.help* --- Display help\n'
         msg += ' *.status* --- Display all monitored currency status\n'
         msg += ' *.stats* --- Display short stats (current price)\n'
@@ -247,7 +246,6 @@ class sbot(threading.Thread):
 
     @listen_to('.stats$', re.IGNORECASE)
     def stats(message):
-        message.react('+1')
         msg = 'Current prices stats: \n'
         for c in symbols.keys():
             msg += ':%s: %s -- *$%s*\n' % (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
@@ -256,7 +254,6 @@ class sbot(threading.Thread):
 
     @listen_to('.status$', re.IGNORECASE)
     def status(message):
-        message.react('+1')
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
@@ -271,11 +268,12 @@ class sbot(threading.Thread):
     def price(message, cur):
         currency = cur.upper() + 'USDT'
         if currency in symbols.keys():
-            message.react('+1')
             message.send(
                 ':%s: current price *$%s*\n --- :arrow_forward: Daily stats $%s-$%s [`%s%%`]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
+        else:
+            message.react(':mut:')
 
 
 if __name__ == '__main__':
