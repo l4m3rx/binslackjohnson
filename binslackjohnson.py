@@ -17,11 +17,16 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d8'
+__version__ = '0.2d9'
 __license__ = 'GPLv3'
 
 
 vstore = None
+
+
+def get_1p(price):
+    # Return 1%
+    return round_it(price/100)
 
 
 def percentage(part, whole):
@@ -139,8 +144,8 @@ def process_message(msg):
 
     # Set some min/max value if none yet set
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
-        vstore.cmax[currency] = round_it(price + (price * 0.001))
-        vstore.cmin[currency] = round_it(price - (price * 0.001))
+        vstore.cmax[currency] = round_it(price + get_1p(price))
+        vstore.cmin[currency] = round_it(price - get_1p(price))
         spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
             round_it(vstore.cmin[currency]),
             round_it(vstore.cmax[currency]))
@@ -155,7 +160,7 @@ def process_message(msg):
 
         # Don't keep tops above 24h top
         if price < vstore.max24[currency]:
-            vstore.cmax[currency] = price
+            vstore.cmax[currency] = price + get_1p(price)
         else:
             vstore.cmax[currency] = vstore.max24[currency]
 
@@ -168,7 +173,7 @@ def process_message(msg):
 
         # Don't keep lows below 24h low
         if price > vstore.min24[currency]:
-            vstore.cmin[currency] = price
+            vstore.cmin[currency] = price - get_1p(price)
         else:
             vstore.cmin[currency] = vstore.min24[currency]
 
@@ -198,7 +203,7 @@ def process_message(msg):
                 (round_it(price - vstore.min24[currency]),
                  round_it(vstore.min24[currency]))
         else:
-            m += 'That is :top: *$%s* above the daily minimum [*$%s*]' % \
+            m += 'That is *$%s* above the daily minimum [*$%s*]' % \
                 (round_it(price - vstore.min24[currency]),
                  round_it(vstore.min24[currency]))
         spam(currency, m)
@@ -206,7 +211,7 @@ def process_message(msg):
         m = '@here price *$%s* change `%s%%` from 5m avg!' % \
             (price, round(p_change, 1))
         if price > vstore.cmax24[currency]:
-            m += 'This is :top: *$%s* above the daily maximum [*$%s*]' % \
+            m += 'This is *$%s* above the daily maximum [*$%s*]' % \
                 (round_it(vstore.max24[currency] - price),
                  round_it(vstore.max24[currency]))
         spam(currency, m)
