@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.2d14'
+__version__ = '0.3a1'
 __license__ = 'GPLv3'
 
 
@@ -196,7 +196,7 @@ def process_message(msg):
         vstore.max24[currency] = price
 
     # Is price change bigger then 1%? 3%?
-    if (abs(p_change) > 1) and (abs(p_change) < 3):
+    if (abs(p_change) > 1.5) and (abs(p_change) < 3):
         m = 'price - *$%s* change `%s%%` from 5m avg\n' % \
             (price, round(p_change, 1))
 
@@ -232,7 +232,7 @@ class sbot(threading.Thread):
         self.bot.run()
 
 
-    @listen_to('.help', re.IGNORECASE)
+    @listen_to('.help$', re.IGNORECASE)
     def help(message):
         message.react('+1')
         msg = 'Available commands:\n *.help* --- Display help\n'
@@ -241,7 +241,7 @@ class sbot(threading.Thread):
         message.send(msg)
 
 
-    @listen_to('.status', re.IGNORECASE)
+    @listen_to('.status$', re.IGNORECASE)
     def status(message):
         message.react('+1')
         for c in symbols.keys():
@@ -264,6 +264,9 @@ class sbot(threading.Thread):
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
+    @default_reply
+    def default_handler(msg):
+        msg.replay('Ко?')
 
 
 if __name__ == '__main__':
