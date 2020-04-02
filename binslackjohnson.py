@@ -226,6 +226,9 @@ class sbot(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         slackbot.settings.API_TOKEN = slack_token
+        slackbot.settings.DEFAULT_REPLY = 'Ko?'
+        slackbot.settings.BOT_EMOJI = slack_bot_icon
+        #slackbot.settings.BOT_ICON = slack_bot_icon
         self.bot = Bot()
 
     def run(self):
@@ -263,11 +266,6 @@ class sbot(threading.Thread):
                 ':%s: current price *$%s*\n --- :arrow_forward: Daily stats $%s-$%s [`%s%%`]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
-
-
-    @default_reply()
-    def default_handler(msg):
-        msg.replay('Ко?')
 
 
 if __name__ == '__main__':
