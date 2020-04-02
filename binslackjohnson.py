@@ -273,7 +273,7 @@ class sbot(threading.Thread):
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
         else:
-            message.react(':mut:')
+            message.react('mut')
 
 
 if __name__ == '__main__':
