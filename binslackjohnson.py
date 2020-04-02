@@ -240,7 +240,7 @@ class sbot(threading.Thread):
         message.react('+1')
         msg = 'Available commands:\n *.help* --- Display help\n'
         msg += ' *.status* --- Display all monitored currency status\n'
-        msg += ' *.stats* --- Display short stats (current price)'
+        msg += ' *.stats* --- Display short stats (current price)\n'
         msg += ' *.price <coin>* --- To display current stats for a specific coin\n'
         message.send(msg)
 
