@@ -264,7 +264,8 @@ class sbot(threading.Thread):
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
 
-    @default_reply
+
+    @default_reply()
     def default_handler(msg):
         msg.replay('Ко?')
 
