@@ -17,7 +17,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3b4'
+__version__ = '0.3b5'
 __license__ = 'GPLv3'
 
 
@@ -272,8 +272,6 @@ class sbot(threading.Thread):
                 ':%s: current price *$%s*\n --- :arrow_forward: Daily stats $%s-$%s [`%s%%`]' % \
                 (cur.lower() ,vstore.now[currency], vstore.min24[currency],
                 vstore.max24[currency], vstore.percent24[currency]))
-        else:
-            message.react('mut')
 
 
 if __name__ == '__main__':
