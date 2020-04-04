@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4a2'
+__version__ = '0.4a3'
 __license__ = 'GPLv3'
 
 
@@ -86,9 +86,12 @@ def get_hourly(currency):
     # Get hourly mix/max
     hd = cryptocompare.get_historical_price_hour(
                         currency, curr='USD', limit=1)
-    print(hd)
-    vstore.hmax[currency] = round_it(hd[-1]['high'])
-    vstore.hmin[currency] = round_it(hd[-1]['low'])
+    try:
+        vstore.hmax[currency] = round_it(hd[-1]['high'])
+        vstore.hmin[currency] = round_it(hd[-1]['low'])
+    except:
+        vstore.hmax[currency] = vstore.cmax[currency]
+        vstore.hmin[currency] = vstore.cmin[currency]
 
 
 def get_24h(client, ran=False):
