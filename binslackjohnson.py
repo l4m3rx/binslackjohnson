@@ -82,16 +82,18 @@ def get_avrg(client, sevent):
         time.sleep(300)
 
 
-def get_hourly(currency, ):
+def get_hourly(currency):
+    # Get hourly mix/max
     hd = cryptocompare.get_historical_price_hour(
                         currency, curr='USD', limit=1)
-    vstore.hmax[currency] = hd[-1]['high']
-    vstore.hmin[currency] = hd[-1]['low']
+    vstore.hmax[currency] = round_it(hd[-1]['high'])
+    vstore.hmin[currency] = round_it(hd[-1]['low'])
 
 
 def get_24h(client, ran=False):
     # Get last 24h top/low/%change for all currencies
     for s in symbols.keys():
+        get_hourly()
         tk = client.get_ticker(symbol=s)
         vstore.max24[s] = round_it(float(tk['highPrice']))
         vstore.min24[s] = round_it(float(tk['lowPrice']))
@@ -266,7 +268,9 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- Daily: $%s-$%s [`%s%%`]\n' % \
+            msg += ' --- Hourly: $%s-$%s\n' % \
+                (vstore.hmin[c], vstore.hmax[c])
+            msg += ' --- Daily:  $%s-$%s [`%s%%`]\n' % \
                 (vstore.min24[c], vstore.max24[c], vstore.percent24[c])
             msg += ' --- Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
