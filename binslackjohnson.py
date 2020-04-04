@@ -93,7 +93,7 @@ def get_hourly(currency):
 def get_24h(client, ran=False):
     # Get last 24h top/low/%change for all currencies
     for s in symbols.keys():
-        get_hourly(s)
+        get_hourly(s[:3].upper())
         tk = client.get_ticker(symbol=s)
         vstore.max24[s] = round_it(float(tk['highPrice']))
         vstore.min24[s] = round_it(float(tk['lowPrice']))
