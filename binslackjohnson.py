@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4a5'
+__version__ = '0.4a6'
 __license__ = 'GPLv3'
 
 
@@ -286,10 +286,14 @@ class sbot(threading.Thread):
     def price(message, cur):
         currency = cur.upper() + 'USDT'
         if currency in symbols.keys():
-            message.send(
-                ':%s: current price *$%s*\n --- :arrow_forward: Daily stats $%s-$%s [`%s%%`]' % \
-                (cur.lower() ,vstore.now[currency], vstore.min24[currency],
-                vstore.max24[currency], vstore.percent24[currency]))
+            msg = ':%s: current price *$%s*\n' % (cur.lower() ,vstore.now[currency])
+            msg += ' --- :arrow_forward: Hourly stats $%s-$%s [Delta: $%s]' % \
+                (vstore.hmin[currency], vstore.hmax[currency],
+                (vstore.hmax[currency] - vstore.hmin[currency]))
+            msg += ' --- :arrow_forward: Daily  stats $%s-$%s [Delta: $%s] [`%s%%`]' % \
+                (vstore.min24[currency], vstore.max24[currency], 
+                (vstore.max24[currency] - vstore.min24[currency]), vstore.percent24[currency])
+            message.send(msg)
 
 
 if __name__ == '__main__':
