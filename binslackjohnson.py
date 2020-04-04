@@ -6,6 +6,8 @@ import time
 import requests
 import threading
 
+import cryptocompare
+
 from binance.client import Client
 from binance.websockets import BinanceSocketManager
 
@@ -17,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.3b5'
+__version__ = '0.4a1'
 __license__ = 'GPLv3'
 
 
@@ -78,6 +80,13 @@ def get_avrg(client, sevent):
         sevent.set()
 
         time.sleep(300)
+
+
+def get_hourly(currency, ):
+    hd = cryptocompare.get_historical_price_hour(
+                        currency, curr='USD', limit=1)
+    vstore.hmax[currency] = hd[-1]['high']
+    vstore.hmin[currency] = hd[-1]['low']
 
 
 def get_24h(client, ran=False):
