@@ -86,6 +86,7 @@ def get_hourly(currency):
     # Get hourly mix/max
     hd = cryptocompare.get_historical_price_hour(
                         currency, curr='USD', limit=1)
+    print(hd)
     vstore.hmax[currency] = round_it(hd[-1]['high'])
     vstore.hmin[currency] = round_it(hd[-1]['low'])
 
