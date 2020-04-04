@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4b1'
+__version__ = '0.4b2'
 __license__ = 'GPLv3'
 
 
@@ -154,7 +154,8 @@ def process_message(msg):
     currency = msg['data']['s']
     price = float(msg['data']['p'])
     # Current price and change
-    p_change = round_it(percentage(vstore.avrg[currency], price))
+    p_change  = round_it(percentage(vstore.avrg[currency], price))
+
     price = round_it(price)
     vstore.now[currency] = price
 
@@ -162,10 +163,6 @@ def process_message(msg):
     if (vstore.cmax[currency] == 0) or (vstore.cmin[currency] == 0):
         vstore.cmax[currency] = round_it(price + get_1p(price))
         vstore.cmin[currency] = round_it(price - get_1p(price))
-        #spam(currency, 'Alert limits [low: *$%s* / high: *$%s*]' % (
-        #    round_it(vstore.cmin[currency]),
-        #    round_it(vstore.cmax[currency]))
-        #)
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
         spam_msg = 'new top: *$%s* :top: !!!\n' % (round_it(price))
@@ -226,6 +223,9 @@ def process_message(msg):
                  round_it(vstore.min24[currency]))
 
         spam(currency, m)
+        # We do this so we don't get constant spam
+        vstore.avrg[currency] = price
+
     elif abs(p_change) >= 3:
         m = '@here price - *$%s*. This is `%s%%` deviation from the 5 min average!!!' % \
             (price, round(p_change, 1))
@@ -235,7 +235,6 @@ def process_message(msg):
                 (round_it(vstore.max24[currency] - price),
                  round_it(vstore.max24[currency]))
         spam(currency, m)
-
 
 
 class sbot(threading.Thread):
