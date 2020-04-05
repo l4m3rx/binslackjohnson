@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4b3'
+__version__ = '0.4b4'
 __license__ = 'GPLv3'
 
 
@@ -276,9 +276,9 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' --- :black_small_square: Hourly: $%s-$%s [Delta: $%s]\n' % \
+            msg += ' --- :black_small_square: Hourly: $%s-$%s [Delta: *$%s*]\n' % \
                 (vstore.hmin[c], vstore.hmax[c], round_it(vstore.hmax[c] - vstore.hmin[c]))
-            msg += ' --- :black_small_square: Daily:  $%s-$%s [Delta: $%s] [`%s%%`]\n' % (vstore.min24[c],
+            msg += ' --- :black_small_square: Daily:  $%s-$%s [Delta: *$%s*] [`%s%%`]\n' % (vstore.min24[c],
                 vstore.max24[c], round_it(vstore.max24[c] - vstore.min24[c]), vstore.percent24[c])
             msg += ' --- :black_small_square: Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
@@ -290,12 +290,13 @@ class sbot(threading.Thread):
         currency = cur.upper() + 'USDT'
         if currency in symbols.keys():
             msg = ':%s: current price *$%s*\n' % (cur.lower() ,vstore.now[currency])
-            msg += ' --- :black_small_square: Hourly stats $%s-$%s [Delta: $%s]\n' % \
+            msg += ' --- :black_small_square: Hourly stats $%s-$%s [Delta: *$%s*]\n' % \
                 (vstore.hmin[currency], vstore.hmax[currency],
-                (vstore.hmax[currency] - vstore.hmin[currency]))
-            msg += ' --- :black_small_square: Daily  stats $%s-$%s [Delta: $%s] [`%s%%`]' % \
+                round_it(vstore.hmax[currency] - vstore.hmin[currency]))
+            msg += ' --- :black_small_square: Daily  stats $%s-$%s [Delta: *$%s*] [`%s%%`]' % \
                 (vstore.min24[currency], vstore.max24[currency], 
-                (vstore.max24[currency] - vstore.min24[currency]), vstore.percent24[currency])
+                round_it(vstore.max24[currency] - vstore.min24[currency]),
+                vstore.percent24[currency])
             message.send(msg)
 
 
