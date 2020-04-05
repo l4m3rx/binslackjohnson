@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '1.0b1'
+__version__ = '1.0b2'
 __license__ = 'GPLv3'
 
 
@@ -192,17 +192,17 @@ def process_message(msg):
 
     # below 24h min?
     if price < vstore.min24[currency]:
-        msg = 'price - *$%s* :arrow_down: \n'
+        msg = 'price - *$%s* :arrow_down: \n' % price
         msg += '--- :black_small_square: This is $-%s below daily minimum [*$%s*]' % \
-            (price, round_it(vstore.min24[currency] - price), round_it(vstore.min24[currency]))
+            (round_it(vstore.min24[currency] - price), round_it(vstore.min24[currency]))
         spam(currency, msg)
         vstore.min24[currency] = price
 
     # Above 24h max?
     if price > vstore.max24[currency]:
-        msg = 'price - *$%s* :top: \n'
+        msg = 'price - *$%s* :top: \n' % price
         msg += '--- :black_small_square: This is $%s above the daily maximum [*$%s*]' % \
-             (price, round_it(price - vstore.max24[currency]), round_it(vstore.max24[currency]))
+             (round_it(price - vstore.max24[currency]), round_it(vstore.max24[currency]))
         spam(currency, msg)
         vstore.max24[currency] = price
 
@@ -223,9 +223,8 @@ def process_message(msg):
         vstore.avrg[currency] = price
 
     elif abs(p_change) >= 2:
-        msg = '@here price - *$%s*. '
-        msg += 'This is `%s%%` deviation from the 5 min average!!!' % \
-            (price, round(p_change, 1))
+        msg = '@here price - *$%s*. ' % price
+        msg += 'This is `%s%%` deviation from the 5 min average!!!' % round(p_change, 1)
 
         if price > vstore.cmax24[currency]:
             msg += 'This is *$%s* above the daily maximum [*$%s*]' % \
