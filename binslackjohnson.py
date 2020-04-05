@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4b2'
+__version__ = '0.4b3'
 __license__ = 'GPLv3'
 
 
@@ -166,7 +166,7 @@ def process_message(msg):
     # Check if we have new min/max
     if (vstore.cmax[currency] < price) and (vstore.max24[currency] > price):
         spam_msg = 'new top: *$%s* :top: !!!\n' % (round_it(price))
-        spam_msg += ' --- Last 24h top: *$%s* | Last 24h change: `%s%%`]' % \
+        spam_msg += ' --- :black_small_square: Last 24h top: *$%s* | Last 24h change: `%s%%`]' % \
                                         (round_it(vstore.max24[currency]),
                                         vstore.percent24[currency])
         spam(currency, spam_msg)
@@ -179,7 +179,7 @@ def process_message(msg):
 
     if (vstore.cmin[currency] > price) and (vstore.min24[currency] < price):
         spam_msg = 'new low: *$%s* :arrow_down: !!!\n' % (round_it(price))
-        spam_msg += ' --- Last 24h bottom: *$%s* | Last 24h change: `%s%%`]' % \
+        spam_msg += ' --- :black_small_square: Last 24h bottom: *$%s* | Last 24h change: `%s%%`]' % \
                                         (round_it(vstore.min24[currency]),
                                         vstore.percent24[currency])
         spam(currency, spam_msg)
@@ -192,7 +192,7 @@ def process_message(msg):
 
     # below 24h min?
     if price < vstore.min24[currency]:
-        m = 'price - *$%s* :arrow_down: \n --- This is $-%s below daily minimum [*$%s*]' % \
+        m = 'price - *$%s* :arrow_down: \n --- :black_small_square: This is $-%s below daily minimum [*$%s*]' % \
             (price,
              round_it(vstore.min24[currency] - price),
              round_it(vstore.min24[currency]))
@@ -201,7 +201,7 @@ def process_message(msg):
 
     # Above 24h max?
     if price > vstore.max24[currency]:
-        m = 'price - *$%s* :top: \n --- This is $%s above the daily maximum [*$%s*]' % \
+        m = 'price - *$%s* :top: \n --- :black_small_square: This is $%s above the daily maximum [*$%s*]' % \
              (price,
               round_it(price - vstore.max24[currency]),
               round_it(vstore.max24[currency]))
@@ -209,7 +209,7 @@ def process_message(msg):
         vstore.max24[currency] = price
 
     # Is price change bigger then 1%? 3%?
-    if (abs(p_change) > 1.5) and (abs(p_change) < 3):
+    if (abs(p_change) > 1) and (abs(p_change) < 2):
         m = 'price - *$%s* change `%s%%` from 5m avg\n' % \
             (price, round(p_change, 1))
 
@@ -226,7 +226,7 @@ def process_message(msg):
         # We do this so we don't get constant spam
         vstore.avrg[currency] = price
 
-    elif abs(p_change) >= 3:
+    elif abs(p_change) >= 2:
         m = '@here price - *$%s*. This is `%s%%` deviation from the 5 min average!!!' % \
             (price, round(p_change, 1))
 
@@ -234,7 +234,11 @@ def process_message(msg):
             m += 'This is *$%s* above the daily maximum [*$%s*]' % \
                 (round_it(vstore.max24[currency] - price),
                  round_it(vstore.max24[currency]))
+
         spam(currency, m)
+        # We do this so we don't get constant spam
+        vstore.avrg[currency] = price
+
 
 
 class sbot(threading.Thread):
