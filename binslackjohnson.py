@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '0.4b6'
+__version__ = '0.4b7'
 __license__ = 'GPLv3'
 
 
@@ -267,7 +267,7 @@ class sbot(threading.Thread):
     def stats(message):
         msg = 'Current prices: \n'
         for c in symbols.keys():
-            msg += ' --- :black_small_square: :%s: %s -- *$%s*\n' % \
+            msg += ' :black_small_square: :%s: %s -- *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
         message.send(msg)
 
@@ -277,12 +277,12 @@ class sbot(threading.Thread):
         for c in symbols.keys():
             msg = ':%s: %s current price: *$%s*\n' % \
                 (symbols[c][0].lower(), symbols[c][0], vstore.now[c])
-            msg += ' :black_small_square: Hourly: $%s-$%s [Delta: *$%s*]\n' % \
+            msg += ' --- :black_small_square: Hourly: $%s-$%s [Delta: *$%s*]\n' % \
                 (vstore.hmin[c], vstore.hmax[c], round_it(vstore.hmax[c] - vstore.hmin[c]))
-            msg += ' :black_small_square: Daily:  $%s-$%s [Delta: *$%s*] [`%s%%`]\n' % \
+            msg += ' --- :black_small_square: Daily:  $%s-$%s [Delta: *$%s*] [`%s%%`]\n' % \
                 (vstore.min24[c], vstore.max24[c],
                 round_it(vstore.max24[c] - vstore.min24[c]), vstore.percent24[c])
-            msg += ' :black_small_square: Notificaiton threshold: $%s-$%s\n' % \
+            msg += ' --- :black_small_square: Notificaiton threshold: $%s-$%s\n' % \
                 (vstore.cmin[c], vstore.cmax[c])
             message.send(msg)
 
