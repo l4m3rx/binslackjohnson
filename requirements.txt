@@ -1,3 +1,4 @@
+binance==0.3
 requests==2.23.0
 slackbot==0.5.6
-binance==0.3
+cryptocompare==0.7.0

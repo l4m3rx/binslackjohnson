@@ -19,7 +19,7 @@ from slackbot.bot import respond_to
 from config import *
 
 
-__version__ = '1.0b2'
+__version__ = '1.0c1'
 __license__ = 'GPLv3'
 
 
@@ -292,7 +292,7 @@ class sbot(threading.Thread):
                 (vstore.hmin[currency], vstore.hmax[currency],
                 round_it(vstore.hmax[currency] - vstore.hmin[currency]))
             msg += ' --- :black_small_square: Daily  stats $%s-$%s [Delta: *$%s*] [`%s%%`]' % \
-                (vstore.min24[currency], vstore.max24[currency], 
+                (vstore.min24[currency], vstore.max24[currency],
                 round_it(vstore.max24[currency] - vstore.min24[currency]),
                 vstore.percent24[currency])
             message.send(msg)

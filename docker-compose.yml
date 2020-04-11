@@ -1,0 +1,19 @@
+version: '2.4'
+
+services:
+  binslackjohnson:
+    build: .
+    image: l4m3rx/binslackjohnson
+    container_name: binslackjohnson
+    cpu_shares: 25
+    mem_limit: 64M
+    restart: unless-stopped
+    volumes:
+      - ./config.py:/bot/config.py:ro
+    networks:
+      - bsj_net
+
+networks:
+  bsj_net:
+    driver: bridge
+
