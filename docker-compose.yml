@@ -6,7 +6,7 @@ services:
     image: l4m3rx/binslackjohnson
     container_name: binslackjohnson
     cpu_shares: 25
-    mem_limit: 64M
+    mem_limit: 96M
     restart: unless-stopped
     volumes:
       - ./config.py:/bot/config.py:ro
